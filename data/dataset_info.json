@@ -1,0 +1,22 @@
+{
+  "all_caps_dpo_train": {
+    "file_name": "all_caps_dpo_train.json",
+    "ranking": true,
+    "columns": {
+      "prompt": "instruction",
+      "query": "input",
+      "chosen": "chosen",
+      "rejected": "rejected"
+    }
+  },
+  "all_caps_dpo_eval": {
+    "file_name": "all_caps_dpo_eval.json",
+    "ranking": true,
+    "columns": {
+      "prompt": "instruction",
+      "query": "input",
+      "chosen": "chosen",
+      "rejected": "rejected"
+    }
+  }
+}
