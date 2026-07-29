@@ -1,95 +1,138 @@
 # CoT controllability with DPO
 
-This workspace trains `Qwen/Qwen3-14B` to follow a reasoning-only capitalization
-instruction while keeping the answer fixed. It uses LLaMA-Factory DPO, Unsloth,
-4-bit QLoRA, and a deterministic 900/100 train/eval split.
+This repository contains the data preparation and full-parameter DPO training
+workflow used to study whether Qwen3-0.6B can follow constraints inside its
+reasoning while preserving final-answer accuracy.
 
-## Why this dataset is a clean DPO contrast
+## Final experiment
 
-The 1,000 source pairs in `all_caps_dpo.json` have:
+The final run combines 5,000 preference examples:
 
-- identical final answers in `chosen` and `rejected`;
-- reasoning traces that differ only by letter case;
-- a leading `<think>...</think>` block in both responses.
+- 1,000 all-caps examples
+- 1,000 no-commas examples
+- 1,000 disclaimer-at-end examples
+- 2,000 multilingual examples across Arabic, English, Spanish, French, Hindi,
+  Russian, and Simplified Chinese
 
-Therefore, the preference signal targets instruction following rather than
-answer correctness. This is your "both answers correct, one follows the
-reasoning instruction" DPO condition. Keep separate experiments for pairs where
-correctness differs; mixing them would make the causal interpretation weaker.
+The deterministic split contains 4,500 training examples and 500 held-out
+validation examples. The final model was trained for one epoch with a
+4,096-token cutoff. Earlier 1,024-token experiments truncated approximately
+80.9% of preference sequences; the 4,096 cutoff reduced that to approximately
+3.6%.
 
-The preparation script does not edit the source file. It validates every pair,
-fixes the malformed Markdown in the repeated instruction in the generated
-splits, shuffles with seed 42, and creates the registered train/eval files.
+The main training notebook is:
 
-## A100 setup
-
-Use Linux with Python 3.11, a working CUDA PyTorch install, and an A100. From a
-fresh environment:
-
-```bash
-git clone --depth 1 https://github.com/hiyouga/LlamaFactory.git
-python3 -m pip install -e ./LlamaFactory
-python3 -m pip install bitsandbytes flash-attn unsloth tensorboard
-huggingface-cli login
+```text
+qwen3_0.6b_all_datasets_dpo_colab.ipynb
 ```
 
-If `flash-attn` tries to build in isolation and fails, install it with
-`python3 -m pip install flash-attn --no-build-isolation`. Verify the environment:
+It is designed for VS Code connected to a Google Colab A100 runtime. It:
 
-```bash
-python3 -c "import torch; print(torch.cuda.get_device_name(), torch.cuda.is_bf16_supported())"
-llamafactory-cli version
+- mounts Google Drive;
+- restores the prepared training bundle;
+- validates and registers all ten train/evaluation datasets;
+- runs baseline validation;
+- performs full-parameter DPO on `Qwen/Qwen3-0.6B`;
+- prints progress and ETA;
+- resumes from the newest Drive checkpoint;
+- evaluates after training;
+- saves `checkpoint-1125` and the final Hugging Face model to Drive;
+- exports training-versus-validation learning reports.
+
+The completed model output directory is:
+
+```text
+MyDrive/CoT_Controllability/qwen3-0.6b-all-controls-5k-cutoff4096-1epoch
 ```
 
-## Validate, inspect lengths, and train
+Key hyperparameters:
 
-```bash
-python3 scripts/prepare_dpo_data.py
-python3 scripts/check_token_lengths.py
-CUDA_VISIBLE_DEVICES=0 bash scripts/train.sh
+| Setting | Value |
+| --- | ---: |
+| Training examples | 4,500 |
+| Validation examples | 500 |
+| Epochs | 1 |
+| Cutoff length | 4,096 |
+| Micro-batch size | 1 |
+| Gradient accumulation | 4 |
+| Effective batch size | 4 |
+| Optimizer steps | 1,125 |
+| Learning rate | `1e-6` |
+| DPO beta | `0.1` |
+| Precision | BF16 |
+
+Copy `colab_qwen_dpo_bundle.zip` to the root of Google Drive before running the
+notebook. The notebook expects:
+
+```text
+/content/drive/MyDrive/colab_qwen_dpo_bundle.zip
 ```
 
-`cutoff_len` starts at 4096. The length checker uses Qwen's actual tokenizer and
-chat template. If many examples exceed 4096 tokens and you have an 80 GB A100,
-try 8192. On a 40 GB A100, keep 4096 first; if out of memory, reduce it to 3072
-or set `lora_target` to `q_proj,v_proj`.
+## Original 1K experiment
 
-Training starts at one epoch and `5e-6`. This is intentionally conservative:
-your pairs are extremely easy and repetitive, so three epochs could overfit the
-capitalization behavior. Compare checkpoints on held-out seen constraints,
-unseen constraints, and task accuracy before increasing epochs.
+`dpo_training.ipynb` contains the earlier 1,000-example all-caps experiment.
+It is retained to document the initial baseline but is not the final combined
+training workflow.
 
-Resume an interrupted run without deleting checkpoints:
+## Data preparation
 
-```bash
-llamafactory-cli train configs/qwen3_14b_all_caps_dpo.yaml \
-  resume_from_checkpoint=outputs/qwen3-14b/all-caps-dpo/checkpoint-N
+The primary source file is:
+
+```text
+data/multilingual_thinking_qwen3_4b_cots.json
 ```
 
-Inspect TensorBoard:
+Run:
 
 ```bash
-tensorboard --logdir outputs/qwen3-14b/all-caps-dpo
+python scripts/prepare_all_dpo_data.py
 ```
 
-Chat with the adapter using the same thinking template used for training:
+The script deterministically constructs the all-caps, no-commas, and
+disclaimer preference pairs, validates the prebuilt multilingual pairs, and
+rewrites `data/dataset_info.json`.
 
-```bash
-llamafactory-cli chat configs/qwen3_14b_all_caps_chat.yaml
+Every DPO row follows the LLaMA-Factory pairwise schema:
+
+```json
+{
+  "instruction": "Reasoning-control instruction",
+  "input": "Original question",
+  "chosen": "<think>Controlled reasoning</think>\n\nFinal answer",
+  "rejected": "<think>Original reasoning</think>\n\nFinal answer"
+}
 ```
 
-## Experimental cautions
+The chosen and rejected responses retain the same final answer. Only the
+reasoning transformation changes.
 
-The data verifies that the two stored final answers match; it does not prove
-that those answers are factually correct. For accuracy claims, evaluate the
-base model and each DPO checkpoint on the same held-out benchmark with a
-deterministic answer extractor.
+Useful scripts:
 
-Your training prompts contain only one constraint (all caps). Improvement on
-that constraint is behavioral learning, not evidence of general CoT
-controllability. Test unseen constraints such as no commas, JSON reasoning,
-keyword exclusion, or another language, while preventing question overlap
-between training and evaluation.
+| Script | Purpose |
+| --- | --- |
+| `scripts/prepare_all_dpo_data.py` | Build, validate, split, and register the datasets |
+| `scripts/check_token_lengths.py` | Measure token lengths and truncation risk |
+| `scripts/report_dpo_learning.py` | Export training/validation accuracy and loss reports |
 
-For the cleanest ablation, hold the split, decoding settings, LoRA rank,
-effective batch size, and token budget fixed across base, SFT, and DPO runs.
+## Final ReasonIF results
+
+All four conditions were evaluated on the same 300 ReasonIF questions with
+identical decoding settings.
+
+| Model | Instruction following | Answer accuracy | Both compliant and correct |
+| --- | ---: | ---: | ---: |
+| Qwen3-0.6B base | 7.7% | 37.7% | 3.3% |
+| 5K DPO, cutoff 1024, epoch 1 | 47.0% | 11.0% | 4.3% |
+| 5K DPO, cutoff 1024, epoch 2 | 48.3% | 6.3% | 2.0% |
+| 5K DPO, cutoff 4096, epoch 1 | 38.0% | 17.3% | 7.3% |
+
+The 4,096-token model produced a lower raw instruction-following score than
+the earlier 1,024-token checkpoints, but retained more answer accuracy and had
+the highest rate of responses that were both compliant and correct.
+
+## Repository hygiene
+
+Model checkpoints, optimizer states, generated reports, logs, local
+LLaMA-Factory configurations, evaluation clones, and private result archives
+are intentionally excluded from Git. Do not commit Hugging Face tokens, API
+keys, or multi-gigabyte model artifacts.

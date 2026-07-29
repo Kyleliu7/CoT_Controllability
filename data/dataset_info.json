@@ -18,5 +18,185 @@
       "chosen": "chosen",
       "rejected": "rejected"
     }
+  },
+  "no_commas_dpo_train": {
+    "file_name": "no_commas_dpo_train.json",
+    "ranking": true,
+    "columns": {
+      "prompt": "instruction",
+      "query": "input",
+      "chosen": "chosen",
+      "rejected": "rejected"
+    }
+  },
+  "no_commas_dpo_eval": {
+    "file_name": "no_commas_dpo_eval.json",
+    "ranking": true,
+    "columns": {
+      "prompt": "instruction",
+      "query": "input",
+      "chosen": "chosen",
+      "rejected": "rejected"
+    }
+  },
+  "disclaimer_at_end_dpo_train": {
+    "file_name": "disclaimer_at_end_dpo_train.json",
+    "ranking": true,
+    "columns": {
+      "prompt": "instruction",
+      "query": "input",
+      "chosen": "chosen",
+      "rejected": "rejected"
+    }
+  },
+  "disclaimer_at_end_dpo_eval": {
+    "file_name": "disclaimer_at_end_dpo_eval.json",
+    "ranking": true,
+    "columns": {
+      "prompt": "instruction",
+      "query": "input",
+      "chosen": "chosen",
+      "rejected": "rejected"
+    }
+  },
+  "multilingual_ar_dpo_eval": {
+    "file_name": "multilingual_ar_dpo_eval.json",
+    "ranking": true,
+    "columns": {
+      "prompt": "instruction",
+      "query": "input",
+      "chosen": "chosen",
+      "rejected": "rejected"
+    }
+  },
+  "multilingual_ar_dpo_train": {
+    "file_name": "multilingual_ar_dpo_train.json",
+    "ranking": true,
+    "columns": {
+      "prompt": "instruction",
+      "query": "input",
+      "chosen": "chosen",
+      "rejected": "rejected"
+    }
+  },
+  "multilingual_en_dpo_eval": {
+    "file_name": "multilingual_en_dpo_eval.json",
+    "ranking": true,
+    "columns": {
+      "prompt": "instruction",
+      "query": "input",
+      "chosen": "chosen",
+      "rejected": "rejected"
+    }
+  },
+  "multilingual_en_dpo_train": {
+    "file_name": "multilingual_en_dpo_train.json",
+    "ranking": true,
+    "columns": {
+      "prompt": "instruction",
+      "query": "input",
+      "chosen": "chosen",
+      "rejected": "rejected"
+    }
+  },
+  "multilingual_es_dpo_eval": {
+    "file_name": "multilingual_es_dpo_eval.json",
+    "ranking": true,
+    "columns": {
+      "prompt": "instruction",
+      "query": "input",
+      "chosen": "chosen",
+      "rejected": "rejected"
+    }
+  },
+  "multilingual_es_dpo_train": {
+    "file_name": "multilingual_es_dpo_train.json",
+    "ranking": true,
+    "columns": {
+      "prompt": "instruction",
+      "query": "input",
+      "chosen": "chosen",
+      "rejected": "rejected"
+    }
+  },
+  "multilingual_fr_dpo_eval": {
+    "file_name": "multilingual_fr_dpo_eval.json",
+    "ranking": true,
+    "columns": {
+      "prompt": "instruction",
+      "query": "input",
+      "chosen": "chosen",
+      "rejected": "rejected"
+    }
+  },
+  "multilingual_fr_dpo_train": {
+    "file_name": "multilingual_fr_dpo_train.json",
+    "ranking": true,
+    "columns": {
+      "prompt": "instruction",
+      "query": "input",
+      "chosen": "chosen",
+      "rejected": "rejected"
+    }
+  },
+  "multilingual_hi_dpo_eval": {
+    "file_name": "multilingual_hi_dpo_eval.json",
+    "ranking": true,
+    "columns": {
+      "prompt": "instruction",
+      "query": "input",
+      "chosen": "chosen",
+      "rejected": "rejected"
+    }
+  },
+  "multilingual_hi_dpo_train": {
+    "file_name": "multilingual_hi_dpo_train.json",
+    "ranking": true,
+    "columns": {
+      "prompt": "instruction",
+      "query": "input",
+      "chosen": "chosen",
+      "rejected": "rejected"
+    }
+  },
+  "multilingual_ru_dpo_eval": {
+    "file_name": "multilingual_ru_dpo_eval.json",
+    "ranking": true,
+    "columns": {
+      "prompt": "instruction",
+      "query": "input",
+      "chosen": "chosen",
+      "rejected": "rejected"
+    }
+  },
+  "multilingual_ru_dpo_train": {
+    "file_name": "multilingual_ru_dpo_train.json",
+    "ranking": true,
+    "columns": {
+      "prompt": "instruction",
+      "query": "input",
+      "chosen": "chosen",
+      "rejected": "rejected"
+    }
+  },
+  "multilingual_zh-Hans_dpo_eval": {
+    "file_name": "multilingual_zh-Hans_dpo_eval.json",
+    "ranking": true,
+    "columns": {
+      "prompt": "instruction",
+      "query": "input",
+      "chosen": "chosen",
+      "rejected": "rejected"
+    }
+  },
+  "multilingual_zh-Hans_dpo_train": {
+    "file_name": "multilingual_zh-Hans_dpo_train.json",
+    "ranking": true,
+    "columns": {
+      "prompt": "instruction",
+      "query": "input",
+      "chosen": "chosen",
+      "rejected": "rejected"
+    }
   }
 }

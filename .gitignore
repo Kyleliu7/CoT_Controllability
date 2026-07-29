@@ -1,0 +1,16 @@
+outputs/
+restored_qwen3_dpo/
+*.log
+*.err.log
+*.tar.gz
+reasonIF/
+reasonif_existing_*.zip
+*.pdf
+configs/full_dpo_local*.yaml
+configs/deepspeed_zero3_offload.json
+configs/qwen3_0.6b_all_datasets_dpo_2epochs.yaml
+tmp_pdf_render/
+tmp_pdf_images/
+_generated_artifacts_archive/
+__pycache__/
+.ipynb_checkpoints/

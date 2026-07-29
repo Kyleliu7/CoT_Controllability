@@ -22,7 +22,7 @@ def main() -> None:
     args = parser.parse_args()
 
     tokenizer = AutoTokenizer.from_pretrained(args.model, trust_remote_code=True)
-    rows = json.loads(args.dataset.read_text())
+    rows = json.loads(args.dataset.read_text(encoding="utf-8"))
     lengths: list[int] = []
     for row in rows:
         prompt = f"{row['instruction']}\n\n{row['input']}".strip()

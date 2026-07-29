@@ -3,7 +3,7 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-python3 scripts/prepare_dpo_data.py
+python3 scripts/prepare_all_dpo_data.py
 python3 scripts/check_token_lengths.py
 
 export CUDA_VISIBLE_DEVICES="${CUDA_VISIBLE_DEVICES:-0}"
